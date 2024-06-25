@@ -1,22 +1,23 @@
 import express from "express";
 //const express = require('express') ->Gives error Because we set "type": "module"
-import { connectDB } from "./utils/features.js";
+import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import { errorMiddleware } from "./middlewares/error.js";
-import cookieParser from "cookie-parser";
+import { connectDB } from "./utils/features.js";
 
-import userRoute from "./routes/user.js";
 import chatRoute from "./routes/chat.js";
-import { createUser } from "./seeders/user.js";
+import userRoute from "./routes/user.js";
+
 
 
 dotenv.config({
-    path:"./.env",
+    path: "./.env",
 })
-const mongoURI =process.env.MONGO_URI 
-const PORT =process.env.PORT || 3000
+const mongoURI = process.env.MONGO_URI
+const PORT = process.env.PORT || 3000
 
 connectDB(mongoURI);
+
 
 
 const app = express();
@@ -27,11 +28,11 @@ app.use(express.json()) //for json data
 app.use(cookieParser());
 
 
-app.use("/user",userRoute)
-app.use("/chat",chatRoute)
+app.use("/user", userRoute)
+app.use("/chat", chatRoute)
 
 
-app.get("/",(req,res)=>{
+app.get("/", (req, res) => {
     res.send("Hello World!")
 })
 

@@ -33,4 +33,5 @@ const emitEvent = (req,event,users,data)=>{
     console.log(event);
 }
 
-export { connectDB, sendToken,cookieOptions,emitEvent}
+const deleteFilesFromCloudinary = ()=>{}
+export { connectDB, sendToken,cookieOptions,emitEvent,deleteFilesFromCloudinary}

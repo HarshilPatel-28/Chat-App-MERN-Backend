@@ -10,4 +10,6 @@ import multer from "multer";
 
 const singleAvatar = multerUpload.single("avatar");
 
-export {multerUpload,singleAvatar}
+const attachmentMulter = multerUpload.array("files",5);
+
+export {singleAvatar,attachmentMulter}
