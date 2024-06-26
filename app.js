@@ -7,6 +7,7 @@ import { connectDB } from "./utils/features.js";
 
 import chatRoute from "./routes/chat.js";
 import userRoute from "./routes/user.js";
+import adminRoute from "./routes/admin.js";
 
 
 
@@ -15,6 +16,10 @@ dotenv.config({
 })
 const mongoURI = process.env.MONGO_URI
 const PORT = process.env.PORT || 3000
+
+const envMode = process.env.NODE_ENV.trim() || "PRODUCTION";
+
+const adminSecretKey = process.env.ADMIN_SECRET_KEY || "adsasdsdfsdfsdfd";
 
 connectDB(mongoURI);
 
@@ -30,6 +35,7 @@ app.use(cookieParser());
 
 app.use("/user", userRoute)
 app.use("/chat", chatRoute)
+app.use("/admin", adminRoute)
 
 
 app.get("/", (req, res) => {
@@ -39,5 +45,7 @@ app.get("/", (req, res) => {
 app.use(errorMiddleware)
 
 app.listen(PORT, () => {
-    console.log(`server is running on port ${PORT}`);
+    console.log(`server is running on port ${PORT} in ${envMode} Mode`);
 })
+
+export {adminSecretKey,envMode}
