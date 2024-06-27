@@ -7,6 +7,8 @@ import { connectDB } from "./utils/features.js";
 import { Server } from "socket.io";
 import { createServer } from 'http'
 import { v4 as uuid } from "uuid";
+import cors from "cors";
+import {v2 as cloudinary} from "cloudinary";
 
 
 import chatRoute from "./routes/chat.js";
@@ -32,6 +34,12 @@ const userSocketIDs = new Map();
 
 connectDB(mongoURI);
 
+cloudinary.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+  });
+
 
 
 const app = express();
@@ -42,11 +50,21 @@ const io = new Server(server, {})
 app.use(express.json()) //for json data
 //app.use(express.urlencoded()) //for form data only text
 app.use(cookieParser());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'http://localhost:4173',
+        process.env.CLIENT_URL
+    ],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+    
+}));
 
 
-app.use("/user", userRoute)
-app.use("/chat", chatRoute)
-app.use("/admin", adminRoute)
+app.use("/api/v1/user", userRoute)
+app.use("/api/v1/chat", chatRoute)
+app.use("/api/v1/admin", adminRoute)
 
 
 app.get("/", (req, res) => {
@@ -92,11 +110,11 @@ io.on("connection", (socket) => {
         io.to(memberSocket).emit(NEW_MESSAGE_ALERT, { chatId })
 
         try {
-        await Message.create(messageForDB)
-            
+            await Message.create(messageForDB)
+
         } catch (error) {
             console.log(error);
-        }        
+        }
     })
 
     socket.on('disconnect', () => {
