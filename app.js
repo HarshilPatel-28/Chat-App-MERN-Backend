@@ -14,7 +14,7 @@ import {v2 as cloudinary} from "cloudinary";
 import chatRoute from "./routes/chat.js";
 import userRoute from "./routes/user.js";
 import adminRoute from "./routes/admin.js";
-import { NEW_MESSAGE, NEW_MESSAGE_ALERT } from "./constants/events.js";
+import { NEW_MESSAGE, NEW_MESSAGE_ALERT, START_TYPING, STOP_TYPING } from "./constants/events.js";
 import { getSockets } from "./lib/helper.js";
 import { Message } from "./models/message.js";
 import { corsOptions } from "./constants/config.js";
@@ -50,6 +50,8 @@ const io = new Server(server, {
     cors:corsOptions,
 })
 
+app.set("io",io)
+
 //Middlewares
 app.use(express.json()) //for json data
 //app.use(express.urlencoded()) //for form data only text
@@ -82,7 +84,7 @@ io.on("connection", (socket) => {
 
 
 
-    console.log('a user connected', socket.id);
+    // console.log('a user connected', socket.id);
 
     socket.on(NEW_MESSAGE, async ({ chatId, members, message }) => {
         const messageForRealTime = {
@@ -117,6 +119,17 @@ io.on("connection", (socket) => {
             console.log(error);
         }
     })
+
+
+    socket.on(START_TYPING, ({ members, chatId }) => {
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(START_TYPING, { chatId });
+      });
+    
+      socket.on(STOP_TYPING, ({ members, chatId }) => {
+        const membersSockets = getSockets(members);
+        socket.to(membersSockets).emit(STOP_TYPING, { chatId });
+      });
 
     socket.on('disconnect', () => {
         console.log(("Disconnected"));
